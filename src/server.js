@@ -1,4 +1,4 @@
-// mengimpor dotenv dan menjalankan konfigurasinya
+// mengimpor dotenv dan menjalankan konfigurasinya Peace
 // eslint-disable-next-line import/no-unresolved
 require('dotenv').config();
 
