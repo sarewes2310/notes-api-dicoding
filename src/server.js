@@ -1,20 +1,32 @@
 // mengimpor dotenv dan menjalankan konfigurasinya Peace
 // eslint-disable-next-line import/no-unresolved
+// mengimpor dotenv dan menjalankan konfigurasinya
 require('dotenv').config();
 
 const Hapi = require('@hapi/hapi');
+
+// notes
 const notes = require('./api/notes');
 const NotesService = require('./services/postgres/NotesService');
 const NotesValidator = require('./validator/notes');
-const ClientError = require('./exceptions/ClientError');
-const UsersService = require('./services/postgres/UsersService');
+
+// users
 const users = require('./api/users');
+const UsersService = require('./services/postgres/UsersService');
 const UsersValidator = require('./validator/users');
+
+// authentications
+const authentications = require('./api/authentications');
+const AuthenticationsService = require('./services/postgres/AuthenticationsService');
+const TokenManager = require('./tokenize/TokenManager');
+const AuthenticationsValidator = require('./validator/authentications');
+const ClientError = require('./exceptions/ClientError');
 
 const init = async () => {
   const notesService = new NotesService();
   const usersService = new UsersService();
-  
+  const authenticationsService = new AuthenticationsService();
+
   const server = Hapi.server({
     port: process.env.PORT,
     host: process.env.HOST,
@@ -25,7 +37,7 @@ const init = async () => {
     },
   });
 
-  await server.register(
+  await server.register([
     {
       plugin: notes,
       options: {
@@ -38,9 +50,18 @@ const init = async () => {
       options: {
         service: usersService,
         validator: UsersValidator,
-      }
-    }
-  );
+      },
+    },
+    {
+      plugin: authentications,
+      options: {
+        authenticationsService,
+        usersService,
+        tokenManager: TokenManager,
+        validator: AuthenticationsValidator,
+      },
+    },
+  ]);
 
   server.ext('onPreResponse', (request, h) => {
     // mendapatkan konteks response dari request
