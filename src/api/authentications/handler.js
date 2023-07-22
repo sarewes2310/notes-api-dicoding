@@ -1,5 +1,5 @@
 /* eslint-disable no-underscore-dangle */
-// const autoBind = require('auto-bind');
+const autoBind = require('auto-bind');
 
 class AuthenticationsHandler {
   constructor(authenticationsService, usersService, tokenManager, validator) {
@@ -7,6 +7,8 @@ class AuthenticationsHandler {
     this._usersService = usersService;
     this._tokenManager = tokenManager;
     this._validator = validator;
+
+    autoBind(this);
   }
 
   async postAuthenticationHandler(request, h) {
@@ -15,7 +17,7 @@ class AuthenticationsHandler {
     const { username, password } = request.payload;
 
     // TODO: cek username with password
-    const id = await this._usersService.verifyUserCredential(username, password);
+    const id = await this._usersService.verifyUserCredentials(username, password);
 
     const accessToken = this._tokenManager.generateAccessToken({ id });
     const refreshToken = this._tokenManager.generateRefreshToken({ id });
@@ -55,8 +57,10 @@ class AuthenticationsHandler {
     this._validator.validateDeleteAuthenticationPayload(request.payload);
 
     const { refreshToken } = request.payload;
+
     await this._authenticationsService.verifyRefreshToken(refreshToken);
     await this._authenticationsService.deleteRefreshToken(refreshToken);
+    console.log(refreshToken);
 
     return h.response({
       status: 'success',

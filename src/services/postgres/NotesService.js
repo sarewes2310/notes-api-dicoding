@@ -10,7 +10,7 @@ class NotesService {
     this.pool = new Pool();
   }
 
-  async verifyNoteOwnerId(id, owner) {
+  async verifyNoteOwner(id, owner) {
     const query = {
       text: 'SELECT * FROM notes WHERE id = $1',
       values: [id],
@@ -18,7 +18,9 @@ class NotesService {
 
     const result = await this.pool.query(query);
 
-    if (!result.rowCount()) {
+    console.log(result);
+
+    if (!result.rowCount) {
       throw new NotFoundError('Catatan tidak ditemukan');
     }
 
@@ -43,6 +45,8 @@ class NotesService {
       text: 'INSERT INTO notes VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING id',
       values: [id, title, body, tags, createdAt, updatedAt, owner],
     };
+
+    console.log(query);
 
     const result = await this.pool.query(query);
 
@@ -96,7 +100,6 @@ class NotesService {
       text: 'DELETE FROM notes WHERE id = $1 RETURNING id',
       values: [id],
     };
-
     const result = await this.pool.query(query);
 
     if (!result.rows.length) {

@@ -12,13 +12,14 @@ class UsersHandler {
     this.validator.validateUserPayload(request.payload);
     const { username, password, fullname } = request.payload;
 
-    const noteId = await this.service.addUser({ username, password, fullname });
+    const userId = await this.service.addUser({ username, password, fullname });
 
     const response = h.response({
       status: 'success',
       message: 'User berhasil ditambahkan',
       data: {
-        noteId,
+        userId,
+        accessToken,
       },
     });
     response.code(201);
@@ -26,22 +27,22 @@ class UsersHandler {
   }
 
   async getUsersHandler(request, h) {
-    const notes = await this.service.getUsers();
+    const users = await this.service.getUsers();
     return h.response({
       status: 'success',
       data: {
-        notes,
+        users,
       },
     });
   }
 
   async getUserByIdHandler(request, h) {
     const { id } = request.params;
-    const note = await this.service.getUserById(id);
+    const user = await this.service.getUserById(id);
     return h.response({
       status: 'success',
       data: {
-        note,
+        user,
       },
     });
   }

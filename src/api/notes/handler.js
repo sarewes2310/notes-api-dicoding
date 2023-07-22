@@ -17,7 +17,7 @@ class NotesHandler {
       title,
       body,
       tags,
-      credentialId,
+      owner: credentialId,
     });
 
     const response = h.response({
@@ -73,7 +73,9 @@ class NotesHandler {
 
   async deleteNoteByIdHandler(request, h) {
     const { id } = request.params;
+    console.log(request.auth.credentials);
     const { id: credentialId } = request.auth.credentials;
+
 
     await this.service.verifyNoteOwner(id, credentialId);
     await this.service.deleteNoteById(id);
