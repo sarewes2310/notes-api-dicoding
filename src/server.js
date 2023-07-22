@@ -93,6 +93,23 @@ const init = async () => {
     return h.continue;
   });
 
+  // mendefinisikan strategy otentikasi jwt
+  server.auth.strategy('notesapp_jwt', 'jwt', {
+    keys: process.env.ACCESS_TOKEN_KEY,
+    verify: {
+      aud: false,
+      iss: false,
+      sub: false,
+      maxAgeSec: process.env.ACCESS_TOKEN_AGE,
+    },
+    validate: (artifacts) => ({
+      isValid: true,
+      credentials: {
+        id: artifacts.decoded.payload.id,
+      },
+    }),
+  });
+
   await server.start();
   console.log(`Server berjalan pada ${server.info.uri}`);
 };
